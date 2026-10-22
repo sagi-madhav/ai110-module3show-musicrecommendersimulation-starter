@@ -120,38 +120,35 @@ Recommendations:
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+We ran sensitivity experiments to observe how the scoring logic behaves:
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+1. Weight Shift Experiment:
+We tested halving the genre weight from 2.0 to 1.0 and doubling the energy similarity weight from 1.0 to 2.0. In the baseline system, a song in the preferred genre easily beat songs in other genres, even if the other song matched the user's mood. Under the shifted weights, songs that matched both the mood and the energy level could outscore same-genre songs with the wrong mood. This made the system feel more mood-driven and responsive to energy, but less loyal to strict musical genre boundaries.
+
+2. Feature Removal Experiment:
+We tested removing the mood matching check completely. Without mood scoring, songs like "Gym Hero" (intense) and "Sunrise City" (happy) scored almost identically for pop listeners because their energy values were both high. Removing mood collapsed emotional nuance and made recommendations feel one-dimensional.
+
+3. Testing Across Diverse User Profiles:
+We tested four distinct user profiles: High-Energy Pop, Chill Lofi, Deep Intense Rock, and an adversarial Conflicted Profile (Metal with Chill mood). High-Energy Pop correctly surfaced energetic pop tracks, Chill Lofi surfaced gentle study beats, and Deep Intense Rock placed heavy rock at the top. The conflicted profile revealed that the recommender gave top spot to the metal track because genre points outweighed the mood contradiction.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+This recommender simulation has several key limitations:
 
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+- Small Catalog Size: The dataset has only 18 songs. When a genre has only one or two songs, the remaining slots are filled with unrelated genres based solely on energy proximity.
+- Genre Bias: Awarding 2.0 points for genre means an aggressive pop song will often rank higher for a pop listener than a cheerful song from another genre.
+- Lack of Audio and Lyric Context: The model relies entirely on static metadata tags. It cannot read lyrics, understand song language, or hear vocal tone.
+- Inflexible Distance Calculation: The energy similarity formula treats all energy distances equally, without accounting for tempo differences or song structure.
 
 ---
 
 ## Reflection
 
-Read and complete `model_card.md`:
+Building this recommender showed how recommendation systems transform simple metadata into mathematical rankings. By breaking musical taste down into genre tags, mood labels, and energy numbers, the system can rank hundreds of songs instantly. However, this process also showed that every ranking formula enforces developer assumptions. Deciding that genre is worth twice as much as mood directly determines what the user hears next.
 
-[**Model Card**](model_card.md)
-
-Write 1 to 2 paragraphs here about what you learned:
-
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+This experiment also highlights where bias and filter bubbles can develop. If a platform relies heavily on content matching or popular tags, it can trap listeners in narrow bubbles and overlook great tracks that do not share the exact same label. Furthermore, underrepresented genres or artists with incomplete metadata risk never being recommended at all. Real recommenders must carefully balance accuracy with diversity to keep discovery fresh and fair.
 
 
 

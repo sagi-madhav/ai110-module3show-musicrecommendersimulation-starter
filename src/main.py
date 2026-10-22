@@ -1,7 +1,7 @@
 """
 Command line runner for the Music Recommender Simulation.
 
-This file helps you quickly run and test your recommender.
+This file helps you quickly run and test your recommender with diverse profiles.
 """
 
 try:
@@ -23,15 +23,32 @@ def print_recommendations(profile_name: str, user_prefs: dict, recommendations: 
 
 
 def main() -> None:
-    """Main execution point for running recommendations."""
+    """Runs recommendation tests across diverse listener profiles."""
     songs = load_songs("data/songs.csv")
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    profiles = [
+        (
+            "High-Energy Pop",
+            {"genre": "pop", "mood": "happy", "energy": 0.85},
+        ),
+        (
+            "Chill Lofi",
+            {"genre": "lofi", "mood": "chill", "energy": 0.35},
+        ),
+        (
+            "Deep Intense Rock",
+            {"genre": "rock", "mood": "intense", "energy": 0.90},
+        ),
+        (
+            "Adversarial Conflicted Profile",
+            {"genre": "metal", "mood": "chill", "energy": 0.95},
+        ),
+    ]
 
-    print("\nTop recommendations:\n")
-    print_recommendations("Default Pop/Happy", user_prefs, recommendations)
+    print("\nRunning Recommender Evaluation:\n")
+    for name, prefs in profiles:
+        recommendations = recommend_songs(prefs, songs, k=5)
+        print_recommendations(name, prefs, recommendations)
 
 
 if __name__ == "__main__":
