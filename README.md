@@ -1,33 +1,34 @@
-# 🎵 Music Recommender Simulation
+# Music Recommender Simulation
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
-
-Your goal is to:
-
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
-
-Replace this paragraph with your own summary of what your version does.
+This project is a Python-based music recommender simulation. It loads song data from a CSV file, accepts a user profile with preferred music characteristics, calculates a similarity score for every song using transparent scoring rules, and ranks the catalog to return top song recommendations with clear explanations.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+Real-world music streaming platforms like Spotify and YouTube use two main approaches to recommend songs: collaborative filtering and content-based filtering. Collaborative filtering uses collective user behavior, analyzing listening histories, playlist additions, likes, and skips to find users with similar habits and recommend what peers enjoyed. Content-based filtering analyzes the attributes of the music itself, such as genre, mood, tempo, energy, and acoustic qualities. Real systems blend both methods at scale. Our simulation focuses on content-based filtering, matching song attributes directly against a user taste profile.
 
-Some prompts to answer:
+### Features Used in the Simulation
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Specific features used by each `Song`:
+- `id`: Unique integer identifier for the song
+- `title`: Name of the song track
+- `artist`: Recording artist or band
+- `genre`: Musical style (for example: pop, lofi, rock, jazz, synthwave)
+- `mood`: Emotional vibe (for example: happy, chill, intense, relaxed, moody)
+- `energy`: Numerical intensity value between 0.0 (very calm) and 1.0 (very energetic)
+- `tempo_bpm`: Song speed measured in beats per minute
+- `valence`: Positiveness of the musical sound between 0.0 and 1.0
+- `danceability`: How suitable the track is for dancing between 0.0 and 1.0
+- `acousticness`: Confidence score between 0.0 and 1.0 that the track is acoustic
 
-You can include a simple diagram or bullet list if helpful.
+Specific features used by `UserProfile`:
+- `favorite_genre`: The genre the user wants to listen to
+- `favorite_mood`: The mood or feeling the user wants
+- `target_energy`: The preferred energy level on a 0.0 to 1.0 scale
+- `likes_acoustic`: Boolean indicator for whether the user prefers acoustic sounds
 
 ---
 
