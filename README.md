@@ -146,9 +146,23 @@ This recommender simulation has several key limitations:
 
 ## Reflection
 
-Building this recommender showed how recommendation systems transform simple metadata into mathematical rankings. By breaking musical taste down into genre tags, mood labels, and energy numbers, the system can rank hundreds of songs instantly. However, this process also showed that every ranking formula enforces developer assumptions. Deciding that genre is worth twice as much as mood directly determines what the user hears next.
+Read and complete `model_card.md`:
 
-This experiment also highlights where bias and filter bubbles can develop. If a platform relies heavily on content matching or popular tags, it can trap listeners in narrow bubbles and overlook great tracks that do not share the exact same label. Furthermore, underrepresented genres or artists with incomplete metadata risk never being recommended at all. Real recommenders must carefully balance accuracy with diversity to keep discovery fresh and fair.
+[**Model Card**](model_card.md)
+
+### Engineering Process Reflection
+
+1. Biggest Learning Moment:
+My biggest learning moment was discovering that scoring weights directly dictate the user experience. Giving genre 2.0 points versus mood 1.0 point meant that genre almost always won. This proved that recommendation algorithms always reflect the assumptions chosen by their builders.
+
+2. Using AI Tools and Verification:
+Using AI tools helped generate diverse test songs quickly, format data cleanly, and outline scoring functions. However, I needed to double-check import paths between module execution and direct script execution, and verify that numerical scoring formulas stayed correctly bounded between 0.0 and 1.0.
+
+3. Surprise About Simple Algorithms:
+I was surprised by how much a simple distance formula can feel like genuine intelligence. Even with basic arithmetic that compares absolute differences in energy and matches category strings, the output feels like a personalized music queue.
+
+4. Next Steps:
+If I extended this project, I would create an interactive slider UI in Streamlit, incorporate extra audio features like valence and acousticness into the score, and add user like and skip tracking to simulate collaborative filtering over time.
 
 
 

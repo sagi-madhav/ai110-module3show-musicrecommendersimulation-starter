@@ -1,60 +1,51 @@
 # Model Card: Music Recommender Simulation
 
-## 1. Model Name  
+## 1. Model Name
 
-VibeMatch 1.0
-
----
-
-## 2. Intended Use  
-
-This model is a prototype content-based music recommender designed for educational simulation and exploration. It matches user preferences against a catalog of songs to produce top song recommendations with plain language explanations. It assumes the user can identify their preferred genre, mood, and energy level. It is built for learning and demonstration rather than large-scale commercial streaming.
+VibeFinder 1.0
 
 ---
 
-## 3. How the Model Works  
+## 2. Goal / Task
 
-The model uses a simple rule-based scoring system to judge how well each song fits what the listener wants. It looks at three main qualities:
-1. Genre Match: If the song belongs to the user's favorite genre, it earns 2.0 points.
-2. Mood Match: If the song matches the user's preferred mood, it earns 1.0 point.
-3. Energy Similarity: The model checks how close the song's energy level is to the user's target energy. Songs that are very close in energy earn up to 1.0 point.
-
-Each song receives a total score between 0.0 and 4.0 points, alongside a list of specific reasons explaining why points were awarded. The model sorts all songs from highest to lowest score and presents the top recommendations to the user.
+The goal of VibeFinder 1.0 is to suggest music tracks from a song catalog based on a listener's taste preferences. The model predicts which songs a user will enjoy by comparing the user's favorite genre, desired mood, and target energy against the attributes of each song.
 
 ---
 
-## 4. Data  
+## 3. Data Used
 
-The simulation runs on a curated catalog in `data/songs.csv`:
-- Catalog Size: 18 songs (expanded from the initial 10 starter tracks with 8 new diverse entries).
+- Catalog Size: 18 songs loaded from `data/songs.csv` (expanded from 10 starter tracks with 8 diverse tracks).
+- Features per Song: id, title, artist, genre, mood, energy (0.0 to 1.0), tempo_bpm, valence, danceability, and acousticness.
 - Genres Represented: pop, lofi, rock, ambient, jazz, synthwave, indie pop, classical, hip-hop, r&b, metal, folk, electronic, blues, and reggae.
 - Moods Represented: happy, chill, intense, relaxed, moody, focused, calm, confident, soulful, aggressive, reflective, energetic, melancholic, and uplifting.
-- Audio Features: Each song includes energy (0.0 to 1.0), tempo in beats per minute, valence (happiness), danceability, and acousticness.
-- Missing Data: The catalog does not include lyrics, language metadata, artist popularity, release era, or dynamic audio waveforms.
+- Dataset Limitations: The catalog is small, contains no audio waveforms or lyrics, and has only 1 to 2 tracks for several genres.
 
 ---
 
-## 5. Strengths  
+## 4. Algorithm Summary
 
-- Predictable and Explainable: Every single recommendation comes with a direct mathematical explanation detailing exactly which points were awarded.
-- Strong Alignment for Standard Profiles: When a user provides straightforward preferences (like lofi and chill), the top tracks match human intuition closely.
-- Smooth Proximity Scoring: The energy formula rewards songs that are near the user's preference along a gradient rather than treating energy as a binary match.
+The model uses a simple rule-based scoring system to evaluate songs:
+1. Genre Match (+2.0 points): If the song genre matches the user favorite genre, add 2.0 points.
+2. Mood Match (+1.0 point): If the song mood matches the user preferred mood, add 1.0 point.
+3. Energy Similarity (up to +1.0 point): Calculated as `1.0 - abs(song_energy - target_energy)`. Songs with energy levels close to the target receive nearly a full point.
 
----
-
-## 6. Limitations and Bias 
-
-During our experiments, we discovered that the system heavily over-prioritizes genre over mood and vibe because a genre match awards 2.0 points out of a maximum of 4.0. For example, when testing the High-Energy Pop profile, "Gym Hero" ranked second because it matched the pop genre, even though its mood was "intense" rather than "happy," beating out an indie pop track that actually matched the "happy" mood. Furthermore, because several genres in the catalog have only a single song, once that song is recommended, all remaining slots are filled with tracks from unrelated genres based solely on energy proximity. Users with cross-genre or non-traditional music tastes risk receiving poor recommendations because the system cannot recognize stylistic overlap outside exact text labels.
+The highest possible score is 4.0 points. The system scores every song in the catalog, sorts them from highest score to lowest score, and returns the top k recommendations with a written explanation of awarded points.
 
 ---
 
-## 7. Evaluation  
+## 5. Observed Behavior / Biases
 
-We evaluated the recommender using four distinct user profiles to test its accuracy, consistency, and vulnerability to conflicting preferences:
-1. High-Energy Pop: genre=pop, mood=happy, energy=0.85
-2. Chill Lofi: genre=lofi, mood=chill, energy=0.35
-3. Deep Intense Rock: genre=rock, mood=intense, energy=0.90
-4. Adversarial Conflicted Profile: genre=metal, mood=chill, energy=0.95
+- Genre Dominance: Because matching a genre awards 2.0 points, genre strongly outweighs mood and energy. For example, when testing a "Happy Pop" profile, the workout song "Gym Hero" scored second because of its pop tag, even though its mood was "intense" rather than "happy."
+- Small Catalog Fallback: When a user selects a genre with only one track in the catalog, that track gets the top spot and all remaining recommendations are pulled from other genres based only on energy similarity.
+- Conflicting Preferences: When given conflicting requirements (such as metal genre with chill mood), the system splits recommendations between loud metal tracks and soft lofi tracks, creating an inconsistent playlist.
+
+---
+
+## 6. Evaluation Process
+
+We evaluated the recommender by running diverse listener profiles, performing logic experiments, and comparing pairwise outputs:
+- Profiles Tested: High-Energy Pop, Chill Lofi, Deep Intense Rock, and an adversarial Conflicted Profile (Metal with Chill mood).
+- Sensitivity Experiments: Shifting weights (halving genre to 1.0 and doubling energy similarity to 2.0) allowed cross-genre songs that matched the mood and energy to beat mismatched songs within the same genre. Removing the mood check completely flattened recommendations into simple energy filters.
 
 ### Evaluation Terminal Output
 
@@ -139,26 +130,35 @@ Recommendations:
 
 ### Explaining "Gym Hero" in Plain Language
 
-To a non-programmer, it might seem confusing why an intense workout anthem like "Gym Hero" keeps showing up for a listener who asked for "Happy Pop." This happens because of how points are weighted in the algorithm recipe. The system awards 2.0 points for a genre match, but only 1.0 point for a mood match. Since "Gym Hero" is labeled as pop, it immediately receives 2.0 points. Because its energy is 0.93 (very close to the target of 0.85), it receives another 0.92 points, giving it a total of 2.92. Even though it is not "happy," its genre points outweigh happier songs from other genres, so it earns the second spot on the list.
+To a non-programmer, it might seem confusing why an intense workout song like "Gym Hero" appears for someone who asked for "Happy Pop." This happens because of our scoring weights. A genre match gives 2.0 points, while a mood match only gives 1.0 point. Since "Gym Hero" is labeled as pop, it gets 2.0 points right away. Its energy is 0.93, which is very close to the target of 0.85, so it gets another 0.92 points. That gives it a total score of 2.92. Even though it is not a happy song, its genre points are high enough to push it into second place over happy songs from other genres.
 
 ### Pairwise Profile Comparisons
 
-- High-Energy Pop vs. Chill Lofi: High-Energy Pop populates the list with loud, upbeat tracks like "Sunrise City" and "Gym Hero", while Chill Lofi completely transitions to quiet study music like "Library Rain" and "Midnight Coding". This makes sense because the energy target dropped from 0.85 down to 0.35 and the preferred mood changed from happy to chill.
-- Chill Lofi vs. Deep Intense Rock: Chill Lofi selects mellow beats with high acousticness, whereas Deep Intense Rock selects heavy distorted tracks like "Storm Runner" and "Iron Foundry". This confirms the model effectively handles opposite ends of the intensity spectrum.
-- Deep Intense Rock vs. High-Energy Pop: Both profiles seek high energy (0.85 to 0.90), but the rock profile ranks "Storm Runner" at the top while the pop profile ranks "Sunrise City" at the top. This demonstrates that the 2.0 point genre weight successfully prevents high-energy songs from bleeding indiscriminately across genres.
-- Deep Intense Rock vs. Adversarial Conflicted Profile: While Deep Intense Rock yields cohesive suggestions, the conflicted profile (metal with chill mood at 0.95 energy) exposes how the system breaks down. It recommends "Iron Foundry" for the metal genre points, but then fills slots 2 through 4 with quiet lofi songs to satisfy the chill mood, creating a disjointed listening queue.
+- High-Energy Pop vs. Chill Lofi: High-Energy Pop recommends loud, upbeat tracks like "Sunrise City" and "Gym Hero", while Chill Lofi shifts completely to quiet study tracks like "Library Rain" and "Midnight Coding". This makes sense because the energy target dropped from 0.85 to 0.35 and the preferred mood changed from happy to chill.
+- Chill Lofi vs. Deep Intense Rock: Chill Lofi selects quiet beats with high acousticness, whereas Deep Intense Rock selects heavy guitar tracks like "Storm Runner" and "Iron Foundry". This confirms the system responds correctly to opposite ends of the energy spectrum.
+- Deep Intense Rock vs. High-Energy Pop: Both profiles want high energy (0.85 to 0.90), but the rock profile places "Storm Runner" at the top while the pop profile places "Sunrise City" at the top. This proves the 2.0 point genre weight prevents high-energy songs from bleeding across genres.
+- Deep Intense Rock vs. Adversarial Conflicted Profile: While the rock profile produces a coherent list, the conflicted profile (metal genre with chill mood) causes the system to compromise awkwardly. It shows one metal song at the top and then fills the rest of the list with quiet lofi songs, creating a mixed result.
 
 ---
 
-## 8. Future Work  
+## 7. Intended Use and Non-Intended Use
 
-- Tunable Weights: Allow users to specify whether they care more about genre or emotional mood.
-- Multi-Attribute Scoring: Incorporate valence (musical positivity) and acousticness into the proximity score to better distinguish cheerful acoustic music from electronic dance tracks.
-- Diversity and Deduplication Filters: Prevent a single artist or genre from dominating all secondary recommendation slots.
-- Hybrid Collaborative Filtering: Combine content attributes with actual user behavior data, such as skip counts and playlist additions.
+- Intended Use: Educational simulation, classroom learning, and exploring basic concepts of content-based recommendation systems in Python.
+- Non-Intended Use: Real-world commercial streaming, production recommendation engines, audio playback platforms, or safety-critical personalization.
 
 ---
 
-## 9. Personal Reflection  
+## 8. Ideas for Improvement
 
-Building this simulation demystified how streaming platforms turn subjective musical taste into objective mathematical rankings. By translating songs into numerical features and applying weighted scoring rules, we can automate recommendations that often feel intuitive. However, the simulation also showed how easily algorithmic assumptions create blind spots. When genre is weighted heavily, the system can trap users in rigid categories and ignore great tracks with the exact mood they want. Designing fair AI systems requires constantly testing edge cases and questioning our default weights.  
+1. Tunable Feature Weights: Allow users to adjust sliders for how much they care about genre versus mood or energy.
+2. Additional Audio Features: Incorporate valence (musical happiness) and acousticness into the scoring formula to capture finer nuances.
+3. Catalog Diversity and Deduplication: Add a reranking step that prevents multiple songs by the same artist or subgenre from dominating all recommendation slots.
+
+---
+
+## 9. Personal Reflection
+
+- Biggest Learning Moment: My biggest learning moment was discovering how strongly developer choices shape recommendations. Deciding that genre is worth 2.0 points while mood is worth 1.0 point directly dictated what songs appeared at the top, showing that algorithms always reflect their designers' assumptions.
+- Using AI Tools and Verification: AI tools helped quickly create diverse song data, draft scoring functions, and brainstorm edge cases. However, I needed to double-check import paths between module mode and script mode, and verify that the mathematical formulas remained bounded between 0.0 and 1.0.
+- Surprise About Simple Algorithms: I was surprised by how much simple arithmetic feels like genuine recommendation intelligence. Even a short formula calculating absolute differences can create a list of songs that feels cohesive and personalized.
+- Next Steps for the Project: If I extended this project, I would build an interactive web interface with Streamlit, add user skip and like tracking to simulate collaborative filtering, and test the algorithm on a catalog of thousands of tracks.
