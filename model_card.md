@@ -1,36 +1,25 @@
-# 🎧 Model Card: Music Recommender Simulation
+# Model Card: Music Recommender Simulation
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+VibeMatch 1.0
 
 ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+This model is a prototype content-based music recommender designed for educational simulation and exploration. It matches user preferences against a catalog of songs to produce top song recommendations with plain language explanations. It assumes the user can identify their preferred genre, mood, and energy level. It is built for learning and demonstration rather than large-scale commercial streaming.
 
 ---
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+The model uses a simple rule-based scoring system to judge how well each song fits what the listener wants. It looks at three main qualities:
+1. Genre Match: If the song belongs to the user's favorite genre, it earns 2.0 points.
+2. Mood Match: If the song matches the user's preferred mood, it earns 1.0 point.
+3. Energy Similarity: The model checks how close the song's energy level is to the user's target energy. Songs that are very close in energy earn up to 1.0 point.
 
-Prompts:  
-
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+Each song receives a total score between 0.0 and 4.0 points, alongside a list of specific reasons explaining why points were awarded. The model sorts all songs from highest to lowest score and presents the top recommendations to the user.
 
 ---
 
