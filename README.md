@@ -30,6 +30,27 @@ Specific features used by `UserProfile`:
 - `target_energy`: The preferred energy level on a 0.0 to 1.0 scale
 - `likes_acoustic`: Boolean indicator for whether the user prefers acoustic sounds
 
+### Algorithm Recipe
+
+The recommender uses a transparent point-based scoring rule:
+1. Genre Match (+2.0 points): Awarded when the song genre matches the user favorite genre exactly.
+2. Mood Match (+1.0 point): Awarded when the song mood matches the user favorite mood exactly.
+3. Energy Similarity (up to +1.0 point): Computed as `1.0 - abs(song_energy - target_energy)`. Songs with energy levels close to the target receive nearly a full point, while distant songs receive fewer points.
+
+The maximum possible score for a song is 4.0 points.
+
+### Recommendation Pipeline
+
+The recommendation process runs as follows:
+1. Input: A user profile dictionary containing target preferences (favorite genre, favorite mood, target energy).
+2. Process: The program loops over every song in the catalog, evaluates it against the user profile using the scoring recipe, and records both the numerical score and the match reasons.
+3. Output: The program sorts all evaluated songs from highest score to lowest score and returns the top k ranked songs.
+
+### Expected Biases
+
+- Genre Dominance: Because matching a genre provides 2.0 points out of a total possible 4.0 points, the system heavily favors genre over mood or vibe. Great songs that share the user target mood and energy might be overlooked if they belong to another genre.
+- Linear Energy Gap: The energy scoring treats distance linearly across the whole scale, which may treat small energy variations in quiet acoustic music the same as large shifts in high energy music.
+
 ---
 
 ## Getting Started
